@@ -339,6 +339,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f24254aa9a54b5c858eaee2f5bccdb46aaf0e486a595ed5fd8f86ba55232a70"
 
 [[package]]
+name = "ic-stable-structures"
+version = "0.6.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a314297eb9edb4bbcc2e04d2e634e38d5900b68eadae661e927946d1aba3f9f7"
+dependencies = [
+ "ic_principal",
+]
+
+[[package]]
+name = "ic_principal"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1762deb6f7c8d8c2bdee4b6c5a47b60195b74e9b5280faa5ba29692f8e17429c"
+
+[[package]]
 name = "icrc-ledger-types"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -360,6 +375,7 @@ name = "icrc-nft-types"
 version = "0.1.0"
 dependencies = [
  "candid",
+ "ic-stable-structures",
  "icrc-ledger-types",
  "serde",
 ]
