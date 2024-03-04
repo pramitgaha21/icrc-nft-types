@@ -10,3 +10,11 @@ pub type Icrc7CollectionMetadata = HashMap<String, MetadataValue>;
 pub struct Icrc7TokenMetadata{
     pub metadata: HashMap<String, MetadataValue>
 }
+
+impl From<HashMap<String, MetadataValue>> for Icrc7TokenMetadata{
+    fn from(value: HashMap<String, MetadataValue>) -> Self {
+        Self{
+            metadata: value
+        }
+    }
+}
