@@ -13,6 +13,8 @@ pub enum MintError{
 pub trait Mintable{
     type MintingAuthority;
 
+    fn is_mintable(&self) -> bool;
+
     fn safe_mint<A: CandidType + Serialize + DeserializeOwned + Debug>(&mut self, mint_arg: &A) -> Result<u128, MintError>;
 
     fn minting_authority(&self) -> Self::MintingAuthority;
