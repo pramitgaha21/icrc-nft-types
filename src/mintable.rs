@@ -1,17 +1,19 @@
+use std::fmt::Debug;
 use candid::CandidType;
-use icrc_ledger_types::icrc1::account::Account;
-use serde::{Deserialize, Serialize};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
 
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub struct MintArg{
-    pub token_id: u128,
-    pub to: Account,
+#[derive(CandidType, Deserialize, Serialize, Debug)]
+pub enum MintError{
+    SupplyCapReached,
+    TokenIdAlreadyExist,
+    Unauthorized,
+    GenericError{ error_code: u128, message: String }
 }
 
 pub trait Mintable{
     type MintingAuthority;
 
-    fn safe_mint(&mut self, mint_arg: &MintArg) -> bool;
+    fn safe_mint<A: CandidType + Serialize + DeserializeOwned + Debug>(&mut self, mint_arg: &A) -> Result<u128, MintError>;
 
     fn minting_authority(&self) -> Self::MintingAuthority;
 }
