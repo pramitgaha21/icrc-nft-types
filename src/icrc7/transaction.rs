@@ -1,34 +1,46 @@
-use candid::{CandidType, Encode, Decode};
-use icrc_ledger_types::{icrc::generic_metadata_value::MetadataValue, icrc1::account::Account};
-use serde::{Serialize, Deserialize};
+use candid::{CandidType, Decode, Encode};
 use ic_stable_structures::storable::{Bound, Storable};
+use icrc_ledger_types::{icrc::generic_metadata_value::MetadataValue, icrc1::account::Account};
+use serde::{Deserialize, Serialize};
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
-pub enum TransactionType {
-    Mint {
-        tid: u128,
-        from: Account,
-        to: Account,
-        meta: MetadataValue,
-    },
-    Burn {
-        tid: u128,
-        from: Account,
-        to: Account,
-    },
-    Transfer {
-        tid: u128,
-        from: Account,
-        to: Account,
-    },
+pub struct Mint {
+    pub tid: u128,
+    pub from: Account,
+    pub to: Account,
+    pub meta: MetadataValue,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Debug)]
+pub struct Burn {
+    pub tid: u128,
+    pub from: Account,
+    pub to: Account,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Debug)]
+pub struct Transfer {
+    pub tid: u128,
+    pub from: Account,
+    pub to: Account,
+}
+
+#[derive(CandidType, Serialize, Deserialize, Debug)]
+pub struct Update {
+    pub tid: u128,
+    pub from: Account,
+    pub meta: MetadataValue,
 }
 
 #[derive(CandidType, Serialize, Deserialize, Debug)]
 pub struct Transaction {
     pub ts: u64,
     pub txn_id: u128,
-    pub op: String,
-    pub txn_type: TransactionType,
+    pub btype: String,
+    pub mint: Option<Mint>,
+    pub burn: Option<Burn>,
+    pub transfer: Option<Transfer>,
+    pub update: Option<Update>,
     pub memo: Option<Vec<u8>>,
 }
 
@@ -45,119 +57,33 @@ impl Storable for Transaction {
 }
 
 impl Transaction {
-    pub fn new(txn_id: u128, txn_type: TransactionType, ts: u64, memo: Option<Vec<u8>>) -> Self {
-        let op = match &txn_type {
-            TransactionType::Transfer {
-                tid: _,
-                from: _,
-                to: _,
-            } => "7xfer".into(),
-            TransactionType::Mint {
-                tid: _,
-                from: _,
-                to: _,
-                meta: _,
-            } => "7mint".into(),
-            TransactionType::Burn {
-                tid: _,
-                from: _,
-                to: _,
-            } => "7burn".into(),
+    pub fn new(
+        txn_id: u128,
+        mint: Option<Mint>,
+        burn: Option<Burn>,
+        transfer: Option<Transfer>,
+        update: Option<Update>,
+        ts: u64,
+        memo: Option<Vec<u8>>,
+    ) -> Self {
+        let btype: String = if mint.is_some() {
+            "7mint".into()
+        } else if burn.is_some() {
+            "7burn".into()
+        } else if transfer.is_some() {
+            "7xfer".into()
+        } else {
+            "7update_token".into()
         };
         Self {
-            op,
+            btype,
+            burn,
+            mint,
+            transfer,
+            update,
             txn_id,
             ts,
-            txn_type,
             memo,
         }
     }
 }
-
-/*
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub struct  Burn {
-    pub tid: u128,
-    pub from: Account,
-    pub to: Account,
-}
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub struct  Transfer {
-    pub tid: u128,
-    pub from: Account,
-    pub to: Account,
-}
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub struct  Mint {
-    pub tid: u128,
-    pub from: Account,
-    pub to: Account,
-    pub meta: MetadataValue,
-}
-
-#[derive(CandidType, Serialize, Deserialize, Debug)]
-pub struct Transaction {
-    pub ts: u64,
-    pub txn_id: u128,
-    pub op: String,
-    pub mint: Option<Mint>,
-   pub tranfer: Option<Transfer>,
-    pub burn: Option<Burn>,
-    pub memo: Option<Vec<u8>>,
-}
-
-impl Transaction {
-    pub fn new(txn_id: u128, txn_type: TransactionType, ts: u64, memo: Option<Vec<u8>>) -> Self {
-        match txn_type {
-            TransactionType::Transfer {
-                tid,
-                from,
-                to,
-            } => {
-                Self{
-                    tranfer: Some(Transfer { tid, from, to }),
-                    op: "7xfer".into(),
-                    ts,
-                    txn_id,
-                    mint: None,
-                    burn: None,
-                    memo,
-                }
-            },
-            TransactionType::Mint {
-                tid,
-                from,
-                to,
-                meta,
-            } => {
-                Self{
-                    tranfer: None,
-                    op: "7mint".into(),
-                    ts,
-                    txn_id,
-                    mint: Some(Mint { tid, from, to, meta }),
-                    burn: None,
-                    memo,
-                }
-            },
-            TransactionType::Burn {
-                tid,
-                from,
-                to,
-            } => {
-                Self{
-                    tranfer: None,
-                    op: "7burn".into(),
-                    ts,
-                    txn_id,
-                    mint: None,
-                    burn: Some(Burn { tid, from, to }),
-                    memo,
-                }
-            },
-        }
-    }
-}
-*/

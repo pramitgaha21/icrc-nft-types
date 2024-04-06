@@ -3,7 +3,7 @@ use icrc_ledger_types::icrc1::account::{Account, Subaccount};
 use serde::{Deserialize, Serialize};
 
 #[derive(CandidType, Deserialize, Serialize, Debug)]
-pub struct TransferArg{
+pub struct TransferArg {
     pub from_subaccount: Option<Subaccount>,
     pub to: Account,
     pub token_id: u128,
@@ -12,7 +12,7 @@ pub struct TransferArg{
 }
 
 #[derive(CandidType, Deserialize, Serialize, Debug, Clone)]
-pub enum TransferError{
+pub enum TransferError {
     NonExistingTokenId,
     InvalidRecipient,
     Unauthorized,
