@@ -224,6 +224,7 @@ dependencies = [
  "ic-stable-structures",
  "icrc-ledger-types",
  "serde",
+ "serde_bytes",
 ]
 
 [[package]]
